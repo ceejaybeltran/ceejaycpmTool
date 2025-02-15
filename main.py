@@ -46,43 +46,40 @@ def banner(console):
     colorful_text = gradient_text(brand_name, colors)
     console.print(colorful_text, end=None)
     console.print("[bold green]♕ CarParkingTool[/bold green]: скрипт который поможет вам стать самым крутым.")
-    console.print("[bold red]==================================================[/bold red]")
-    console.print("[bold yellow]! Note[/bold yellow]: Вам нужно выйти с игры перед использованием !.", end="\n\n")
-
 def load_player_data(cpm):
     response = cpm.get_player_data()
     if response.get('ok'):
         data = response.get('data')
         if 'floats' in data and 'localID' in data and 'money' in data and 'coin' in data:
             console.print("[bold][red]================[/red][ PLAYER DETAILS ][red]================[/red][/bold]")
-            console.print(f"[bold green]Name   [/bold green]: { (data.get('Name') if 'Name' in data else 'UNDEFINED') }.")
-            console.print(f"[bold green]LocalID[/bold green]: { (data.get('localID') if 'localID' in data else 'UNDEFINED') }.")
-            console.print(f"[bold green]Money  [/bold green]: { (data.get('money') if 'money' in data else 'UNDEFINED') }.")
-            console.print(f"[bold green]Coins  [/bold green]: { (data.get('coin') if 'coin' in data else 'UNDEFINED') }.")
+            console.print(f"[bold green]Name   [/bold green]: {data.get('Name', 'UNDEFINED')}.")
+            console.print(f"[bold green]LocalID[/bold green]: {data.get('localID', 'UNDEFINED')}.")
+            console.print(f"[bold green]Money  [/bold green]: {data.get('money', 'UNDEFINED')}.")
+            console.print(f"[bold green]Coins  [/bold green]: {data.get('coin', 'UNDEFINED')}.")
         else:
-            console.print("[bold red]! ERROR[/bold red]: new accounts most be signed-in to the game at least once !.")
+            console.print("[bold red]! ERROR[/bold red]: New accounts must be signed into the game at least once!")
             exit(1)
     else:
-        console.print("[bold red]! ERROR[/bold red]: seems like your login is not properly set !.")
+        console.print("[bold red]! ERROR[/bold red]: It seems like your login is not properly set!")
         exit(1)
-    
+
 def load_key_data(cpm):
     data = cpm.get_key_data()
     console.print("[bold][red]==================================================[/red][/bold]")
-    console.print(f"[bold green]Balance    [/bold green]: { (data.get('coins') if not data.get('is_unlimited') else 'Unlimited') }.")
+    console.print(f"[bold green]Balance    [/bold green]: {data.get('coins', 'N/A') if not data.get('is_unlimited') else 'Unlimited'}.")
 
 def load_client_details():
     response = requests.get("http://ip-api.com/json")
     data = response.json()
     console.print("[bold][red]==================================================[/red][/bold]")
-    console.print(f"[bold][green]Location[/bold][/green]: {data.get('city')}, {data.get('regionName')}, {data.get('countryCode')}")
-    console.print(f"[bold][green]ISP[/bold][/green]     : {data.get('isp')}")
+    console.print(f"[bold][green]Location[/bold][/green]: {data.get('city', 'Unknown')}, {data.get('regionName', 'Unknown')}, {data.get('countryCode', 'Unknown')}")
+    console.print(f"[bold][green]ISP[/bold][/green]     : {data.get('isp', 'Unknown')}")
     console.print("[bold][red]===================[/red][ SERVICES ][red]===================[/red][/bold]")
 
 def prompt_valid_value(content, tag, password=False):
     while True:
         value = Prompt.ask(content, password=password)
-        if not value or value.isspace():
+        if not value.strip():
             print(f"{tag} cannot be empty or just spaces. Please try again.")
         else:
             return value
@@ -115,6 +112,7 @@ if __name__ == "__main__":
         console.print("[bold cyan][%] Trying to Login[/bold cyan]: ", end=None)
         cpm = CarParkTool(acc_access_key)
         login_response = cpm.login(acc_email, acc_password)
+
         if login_response != 0:
             if login_response == 100:
                 console.print("[bold red]ACCOUNT NOT FOUND[/bold red].")
@@ -122,10 +120,6 @@ if __name__ == "__main__":
                 continue
             elif login_response == 101:
                 console.print("[bold red]WRONG PASSWORD[/bold red].")
-                sleep(2)
-                continue
-            elif login_response == 103:
-                console.print("[bold red]INVALID ACCESS KEY[/bold red].")
                 sleep(2)
                 continue
             else:
